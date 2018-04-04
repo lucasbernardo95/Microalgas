@@ -22,7 +22,9 @@ public class SimpleCallback implements MqttCallback {
     /**
      * Quando houver a detecção de uma nova mensagem no tópico de interesse do 
      * subscriber esse método é chamado e printa a mensagem recebida
+     * @throws java.lang.Exception
      */ 
+    @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         System.out.println("-------------------------------------------------");
         System.out.println("| Topic:" + topic);
