@@ -5,6 +5,7 @@
  */
 package com.tads.eaj.orion.service;
 
+import com.tads.eaj.orion.model.Node;
 import com.tads.eaj.orion.model.Sensor;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,28 @@ public class ServicoESP {
         return Response.status(Response.Status.OK).entity(lista)
                     .header("Access-Control-Allow-Origin", "*")
                     .build();//200
+    }
+    
+    
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response registrarDado(Node no) {
+        
+        if (no == null) {
+            
+            
+            
+            return Response.status(Response.Status.OK)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity("Nenhum dado foi recebido")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .build();//500
+        }
+    
     }
     
 }

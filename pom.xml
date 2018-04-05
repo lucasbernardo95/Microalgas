@@ -52,6 +52,13 @@
             <version>1.0.2</version>
         </dependency>
         
+        <!-- Dependência do firebasae -->
+        <dependency>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
+            <version>5.8.0</version>
+        </dependency>
+        
     </dependencies>
     
     

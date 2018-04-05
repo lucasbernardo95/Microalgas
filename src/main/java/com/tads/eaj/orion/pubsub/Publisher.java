@@ -17,7 +17,7 @@ public class Publisher {
 
     public static void main(String[] args) {
 
-        String topic = "orion/temperature";
+        String topic = "orion/energyPolicy";
         String content = "choro level 4";
         int qos = 2;
         String broker = "tcp://localhost:1883";
