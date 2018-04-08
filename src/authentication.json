@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "orion-remote-manager",
+  "private_key_id": "3279248a3503a5f78b7c8e2e1fba44cc12c8189a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCgRyOKRQ9kpU6E\nVD5FlhH7CPDK7ksUBb133Atnxs2yN1/o9bMUMQupGL54zlrI+pmqYkEU9IQfSmFU\nVehNhm5c0Ihw+zFLDA7n6v/7STbhtoNbzFaKP23vaQoGXTPX4DUMejjYAOuEApt5\nvK2jAWohh26NlD7bAl46a7YXaHkCItjoK/LIyPpfqJBZgdvlrSdMkg1J+DQLRnpz\nr79h0k0LQJ8bwOAKB4gz45303am2UxTY20miBhGJWJqIfhIdp1mdPLaZAek7O1tc\nC07WQSsrlI8HnXvPLlbx1jTGhVxrUH6lXW1muM+YI+j1Qu3FoS2FipqJrwUWc0Rs\nqV0w03x5AgMBAAECggEAGROtp1jGdPL6QHEP1y0I6NPix4AWG260e22LE/RtGDOw\nHA+z3PZkLSj+cCyqfqSFk2d7vaQY4e5uIQGvRCXtht8SYfRN/OseOpda8BLp9ScX\nEVn8tkpV+y3eOtWtTVrlN0EOO27qv8T1VMw6XJ/ViPkayShcgewHwzCOv8XW8l2H\n+BsO1Z6LPDZgQx9BKWWQqvUoWi9N9cA6GeigoPg6rEJjd4fAjgVpf2NXaZ7qF752\ndFQ3DpwFYR9I4MssQsE8wiXFCCGkUlhKHSCRA7ASI7ikElG739vAPnLCGa33wGal\nukjliOAryiJiXz4/1hDpkaYeXjmXlKSyJ+MTcdyQmwKBgQDiPBLa819gtoN4KGxV\niEMg8LUu58Mdr7++lzawfQKK3OYJW3Y20fMcWIjgdaWpfoaH6JlRKqcEWAZsnBJI\np6i1phLEYTJ4wAJdFWg2xtDjog58wKdrTBA5yajF8PFfsXZXHuUwfyPYpujlYYa7\n2zYKD5I4uT0FnQ4i+/XE/DwwFwKBgQC1XYp8vAzACSqkTXDxu5TOne2J1cn6eRTq\nkdnvSLjIJfaxhAJfinpFUFznn9MqQdi4hsiP+4/E8v0WBDAKkyOBzEATBJEdzTvr\nZSqVGPgrx6dSxS3K7ttAbNa9kjaU76cg4bwlgjJxjnja8xpvv9DQgCKZgWLtZZtF\nVePqtDGB7wKBgQDaeJjcx9l7U8Vx69dyYbwxu0G8oiNSL75DF1PA63fhEaEzuBdY\nqTbUUMsdt37bR0wzQvOL5lyTXU4W5EDj2MSbZl0JN7O91+5wZZPWEfj3WjATWRhU\nDYg9xfgt7pepiX52c2dwhdbgCY8utBegofh1jsPt8zRyj1BviFG2gL6+0QKBgQC0\n9huLL9sM9Vh9zeNG32Kv8jYkFJPOfmfXUSYBsi7lTbPjFZOEntg3NuMsHXWGMWM7\nYwjVWSzvV4AdKpqAwqVoClNYZnMhKDmEO1IMqHhevnx+gs2ZMVDE7JQrXKtnWeQJ\nVBL13f3U/lIqLOyQ2fRRRbjAL7B0rLALs5KRCbBoMwKBgEHguXzFcsthfEyeqDF0\nB7V3R74oFsJwtBoLaeS/3P7tbZuYcdOF+poorrtXjrH5D+3odwjZZWJTt1v0ghYY\nSu4GREkPcdjDP6n94i+mYfLERzUjI0fg/Pq5ssTiARJQStNwoeSKanVUZHdoKQPJ\nUnS0HbUKiU7t9hyAlncMntPt\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-ck1u5@orion-remote-manager.iam.gserviceaccount.com",
+  "client_id": "103980289192776604404",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-ck1u5%40orion-remote-manager.iam.gserviceaccount.com"
+}
