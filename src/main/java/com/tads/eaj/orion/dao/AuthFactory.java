@@ -284,7 +284,7 @@ public class AuthFactory {
         String uid = "ZqUyhCnHIiVxmWhMtUaxvJRWYbm2";
         FileInputStream serviceAccount;
         try {
-            serviceAccount = new FileInputStream("C:\\Users\\lber\\Documents\\authentication\\authentication.json");
+            serviceAccount = new FileInputStream("C:\\Users\\Aluno\\Documents\\NetBeansProjects\\orionRemoteManager\\authentication.json");//https://console.firebase.google.com/project/orion-remote-manager/settings/serviceaccounts/adminsdk
             Map<String, Object> auth = new HashMap<String, Object>();
             auth.put(uid, "my-service-worker");
             FirebaseOptions options = new FirebaseOptions.Builder()

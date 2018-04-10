@@ -37,12 +37,11 @@ public class Test {
 //                dao.buscar("nome", "lol beta");//ok
 //        salvar();
 //        atualizar("-L9hUBXshdxisEv184-Z", new Usuario("chupa cabra", "querodormir@live.com"));
-        listar();
-//        excluir("-L9hj2QCqZgCW-tHUWsZ");
-//        buscar("juninho@yahoo.com");
+//        listar();
+            excluir("nome", "lucas bernardo");
+//        buscar("nome", "junin da mobilete");
 //        buscaTeste();
-        listAllUsers();//lista os usuários encontrados
-//        getUserById("lucas-uid");
+        listAllUsers();
         createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
     }
 
@@ -54,9 +53,9 @@ public class Test {
         return FirebaseDatabase.getInstance().getReference(caminho);
     }
 
-    private static void buscaTeste2() {
+    private static void buscar(String field, String value) {
         AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        Query query = getReferenceDataBase().child("teste").child("user1").orderByChild("nome").equalTo("1");
+        Query query = getReferenceDataBase().child("teste").orderByChild(field).equalTo(value);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot ds) {
@@ -70,76 +69,6 @@ public class Test {
         });
     }
     
-    private static void buscaTeste() {
-        AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        reference.child("teste")
-            .addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot ds, String string) {
-                
-                System.out.println("recebeu esse papangu: " + ds.toString());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot ds, String string) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot ds) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot ds, String string) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onCancelled(DatabaseError de) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-    }
-
-    private static void buscar() throws InterruptedException, ExecutionException {
-        AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        getReferenceDataBase("teste").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot ds, String key) {
-                Usuario u = ds.getValue(Usuario.class);
-                System.out.println("Added=> key: " + key + "\nUsuario: " + u.toString());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot ds, String key) {
-                Usuario u = ds.getValue(Usuario.class);
-                System.out.println("Changed=> key: " + key + "\nUsuario: " + u.toString());
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot ds) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot ds, String string) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onCancelled(DatabaseError de) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-    }
-
-    private static void excluir(String key) throws InterruptedException, ExecutionException {
-        AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        getReferenceDataBase("teste/" + key).removeValueAsync();
-    }
-
     private static void listar() throws InterruptedException, ExecutionException {
 
         //consultas: https://firebase.google.com/docs/database/admin/retrieve-data?hl=pt-br
@@ -147,14 +76,12 @@ public class Test {
         DatabaseReference ref = getReferenceDataBase().child("teste");
         listAllUsers();//lista os usuários encontrados
         createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-        
-        System.out.println("\nkey" + ref.getRoot() + "\n" + ref.toString() + "\n" + ref.getRef() + "\n" + ref.getKey() + "\n");
-        
+
         ref.orderByKey().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String key) {
                 Usuario u = ds.getValue(Usuario.class);
-                System.out.println("Added=> key: " + key + "\nUsuario: " + u.toString());
+                System.out.println("key = " + key + " Usuario: " + u.toString());
             }
 
             @Override
@@ -179,6 +106,12 @@ public class Test {
             }
 
         });
+    }
+
+    private static void excluir(String field, String value) throws InterruptedException, ExecutionException {
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();
+        Query query = getReferenceDataBase().child("teste").orderByChild(field).equalTo(value);
+//        query.
     }
 
     private static void atualizar(String key, Usuario usuario) throws InterruptedException, ExecutionException {
@@ -202,7 +135,7 @@ public class Test {
         listAllUsers();//lista os usuários encontrados
 //        getUserById("lucas-uid");
         createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-        Usuario u = new Usuario("1", "lucasbernardo@yahoo.com");
+        Usuario u = new Usuario("junin da mobilete", "juninho@yahoo.com");
 
         newRef.setValueAsync(u);
 
