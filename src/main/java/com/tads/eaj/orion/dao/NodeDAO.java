@@ -10,7 +10,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.tads.eaj.orion.model.Usuario;
+import com.tads.eaj.orion.model.Node;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -21,13 +21,13 @@ import java.util.logging.Logger;
  *
  * @author lber
  */
-public class UsuarioDAO {
+public class NodeDAO {
 
-//    private Usuario usuario;
+
     private void gerarToken() throws InterruptedException, ExecutionException {
         AuthFactory.getInstanceAuthFactory().getUserById("lucas-uid");//Recupera o uid do usuário
-        AuthFactory.getInstanceAuthFactory().getUserByEmail("bernardotriton@gmail.com");//recupera o email
-        AuthFactory.getInstanceAuthFactory().getUserByPhoneNumber("+5584991770750");//recupera o telefone
+//        AuthFactory.getInstanceAuthFactory().getUserByEmail("bernardotriton@gmail.com");//recupera o email
+//        AuthFactory.getInstanceAuthFactory().getUserByPhoneNumber("+5584991770750");//recupera o telefone
         AuthFactory.getInstanceAuthFactory().listAllUsers();//lista os usuários encontrados
         AuthFactory.getInstanceAuthFactory().createCustomToken();//cria um token para liberar as operações
     }
@@ -37,26 +37,26 @@ public class UsuarioDAO {
      * o dado enviado não exista na tabela informada
      *
      * @param id chave primária do objeto (identificador)
-     * @param usuario ojeto a ser salvo
+     * @param node ojeto a ser salvo
      */
-    public void merge(String id, Usuario usuario) {
+    public void merge(String id, Node node) {
         try {
             //seta as credênciais da aplicação para autenticação com o banco
             AuthFactory.getInstanceAuthFactory().isAppAutentication();
             //seta o objeto e o id
             Map<String, Object> objeto = new HashMap();
-            objeto.put(id, usuario);
+            objeto.put(id, node);
             //detecta alterações na tabela
             notificar();
             //informa a tabela e salva
-            getReference("usuarios").updateChildrenAsync(objeto);
+            getReference("nodes").updateChildrenAsync(objeto);
             //gera um toquem com dados do usuário da aplicação
             gerarToken();
 
         } catch (InterruptedException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         } 
 
     }
@@ -78,24 +78,24 @@ public class UsuarioDAO {
      * todos os outros eventos ocorridos antes da geração do instantâneo.
      */
     private void notificar() {
-        getReference("usuarios").addChildEventListener(
+        getReference("nodes").addChildEventListener(
                 new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String chaveAnterior) {
-                Usuario u = ds.getValue(Usuario.class);
+                Node u = ds.getValue(Node.class);
                 System.out.println("Um novo elemento foi adicionado:\n" + u.toString());
                 System.out.println("ID da chave anterior:\n\n" + chaveAnterior);
             }
 
             @Override
             public void onChildChanged(DataSnapshot ds, String string) {
-                Usuario u = ds.getValue(Usuario.class);
+                Node u = ds.getValue(Node.class);
                 System.out.println("Alteração detectada em:\n\n" + u.toString());
             }
 
             @Override
             public void onChildRemoved(DataSnapshot ds) {
-                Usuario u = ds.getValue(Usuario.class);
+                Node u = ds.getValue(Node.class);
                 System.out.println("O seguinte dado foi excluído:\n\n" + u.toString());
             }
 
@@ -116,12 +116,12 @@ public class UsuarioDAO {
         try {
             AuthFactory.getInstanceAuthFactory().isAppAutentication();
             //listar todos por nome
-            getReference("usuarios").orderByKey().addChildEventListener(
+            getReference("nodes").orderByKey().addChildEventListener(
                     new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot ds, String key) {
-                    Usuario u = ds.getValue(Usuario.class);
-                    System.out.println("Chave: " + key + " usuario: " + ds.toString());
+                    Node u = ds.getValue(Node.class);
+                    System.out.println("Chave: " + key + " Node: " + ds.toString());
                 }
 
                 @Override
@@ -148,9 +148,9 @@ public class UsuarioDAO {
 
             gerarToken();
         } catch (InterruptedException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -172,17 +172,18 @@ public class UsuarioDAO {
     public void buscar(String field, String value) {
         try {
             AuthFactory.getInstanceAuthFactory().isAppAutentication();
-            getReference("usuarios").orderByChild(field).equalTo(value).addChildEventListener(
+            getReference("node1").orderByChild(field).equalTo(value).addChildEventListener(
                     new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot ds, String key) {
-                    Usuario u = ds.getValue(Usuario.class);
-                    System.out.println("Chave: " + key + " usuario: " + ds.toString());
+                    Node u = ds.getValue(Node.class);
+                    System.out.println("onChildAdded=>Chave: " + key + " Node: " + ds.toString());
                 }
 
                 @Override
-                public void onChildChanged(DataSnapshot ds, String string) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                public void onChildChanged(DataSnapshot ds, String key) {
+                    Node u = ds.getValue(Node.class);
+                    System.out.println("onChildChanged=> Chave: " + key + " Node: " + ds.toString());
                 }
 
                 @Override
@@ -203,9 +204,9 @@ public class UsuarioDAO {
 
             gerarToken();
         } catch (InterruptedException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -217,13 +218,13 @@ public class UsuarioDAO {
     public void deletar(String key) {
         try {
             AuthFactory.getInstanceAuthFactory().isAppAutentication();
-            getReference("usuarios/"+key).removeValueAsync();
+            getReference("nodes/"+key).removeValueAsync();
             notificar();
             gerarToken();
         } catch (InterruptedException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
-            Logger.getLogger(UsuarioDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

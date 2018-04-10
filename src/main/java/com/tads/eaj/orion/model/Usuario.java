@@ -7,6 +7,7 @@ package com.tads.eaj.orion.model;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 
 @IgnoreExtraProperties
-public class Usuario {
+public class Usuario implements Serializable{
     
     private String nome;
     private String email;
@@ -52,6 +53,40 @@ public class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 31 * hash + (this.nome != null ? this.nome.hashCode() : 0);
+        hash = 31 * hash + (this.email != null ? this.email.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Usuario other = (Usuario) obj;
+        if ((this.nome == null) ? (other.nome != null) : !this.nome.equals(other.nome)) {
+            return false;
+        }
+        if ((this.email == null) ? (other.email != null) : !this.email.equals(other.email)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Usuario{" + "nome=" + nome + ", email=" + email + '}';
     }
     
 }

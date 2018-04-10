@@ -21,13 +21,13 @@ import com.google.firebase.auth.UserRecord;
 import com.google.firebase.auth.UserRecord.CreateRequest;
 import com.google.firebase.auth.UserRecord.UpdateRequest;
 import com.google.firebase.database.*;
-import com.tads.eaj.orion.model.Usuario;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 /**
  * Auth snippets for documentation.
@@ -36,9 +36,29 @@ import java.util.concurrent.ExecutionException;
  */
 public class AuthFactory {
 
+    //Padrão de projeto singleton, faz com que haja apenas uma instância desse objeto para todo o oprojeto
+    private static final AuthFactory instance = new AuthFactory();
+
+    //indica se a aplicação foi autenticada ( se tem permissão para usar a base de dados)
+    private static boolean appAutentication;
+
+    public boolean isAppAutentication() {
+        if (!appAutentication) {
+            appAutentication = authenticateWithPrivileges();
+        }
+        return appAutentication;
+    }
+
+    private AuthFactory() {
+    }
+
+    public static AuthFactory getInstanceAuthFactory() {
+        return instance;
+    }
+
     public static DatabaseReference reference;
-    
-    public static void getUserById(String uid) throws InterruptedException, ExecutionException {
+
+    public void getUserById(String uid) throws InterruptedException, ExecutionException {
         // [START get_user_by_id]
         UserRecord userRecord = FirebaseAuth.getInstance().getUserAsync(uid).get();
         // See the UserRecord reference doc for the contents of userRecord.
@@ -46,7 +66,7 @@ public class AuthFactory {
         // [END get_user_by_id]
     }
 
-    public static void getUserByEmail(String email) throws InterruptedException, ExecutionException {
+    public void getUserByEmail(String email) throws InterruptedException, ExecutionException {
         // [START get_user_by_email]
         UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmailAsync(email).get();
         // See the UserRecord reference doc for the contents of userRecord.
@@ -54,8 +74,7 @@ public class AuthFactory {
         // [END get_user_by_email]
     }
 
-    public static void getUserByPhoneNumber(
-            String phoneNumber) throws InterruptedException, ExecutionException {
+    public void getUserByPhoneNumber(String phoneNumber) throws InterruptedException, ExecutionException {
         // [START get_user_by_phone]
         UserRecord userRecord = FirebaseAuth.getInstance().getUserByPhoneNumberAsync(phoneNumber).get();
         // See the UserRecord reference doc for the contents of userRecord.
@@ -107,8 +126,7 @@ public class AuthFactory {
         // [END update_user]
     }
 
-    public static void setCustomUserClaims(
-            String uid) throws InterruptedException, ExecutionException {
+    public static void setCustomUserClaims(String uid) throws InterruptedException, ExecutionException {
         // [START set_custom_user_claims]
         // Set admin privilege on the user corresponding to uid.
         Map<String, Object> claims = new HashMap();
@@ -162,7 +180,7 @@ public class AuthFactory {
         // [END set_custom_user_claims_incremental]
     }
 
-    public static void listAllUsers() throws InterruptedException, ExecutionException {
+    public void listAllUsers() throws InterruptedException, ExecutionException {
         // [START list_all_users]
         // Start listing users from the beginning, 1000 at a time.
         ListUsersPage page = FirebaseAuth.getInstance().listUsersAsync(null).get();
@@ -189,7 +207,7 @@ public class AuthFactory {
         // [END delete_user]
     }
 
-    public static void createCustomToken() throws InterruptedException, ExecutionException {
+    public void createCustomToken() throws InterruptedException, ExecutionException {
         // [START custom_token]
         String uid = "lucas-uid";
 
@@ -262,48 +280,58 @@ public class AuthFactory {
 
     }
 
-    public static void authenticateWithPrivileges() throws FileNotFoundException, IOException {
-        FileInputStream serviceAccount = new FileInputStream("C:\\Users\\lber\\Documents\\authentication\\authentication.json");
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://orion-remote-manager.firebaseio.com")
-                .build();
-        FirebaseApp.initializeApp(options);
-        setReference( FirebaseDatabase.getInstance().getReference() );//indica um caminho para criar a tabela getReference exemplo "admin/energy"
+    private boolean authenticateWithPrivileges() {
+        String uid = "ZqUyhCnHIiVxmWhMtUaxvJRWYbm2";
+        FileInputStream serviceAccount;
+        try {
+            serviceAccount = new FileInputStream("C:\\Users\\lber\\Documents\\authentication\\authentication.json");
+            Map<String, Object> auth = new HashMap<String, Object>();
+            auth.put(uid, "my-service-worker");
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl("https://orion-remote-manager.firebaseio.com")
+                    .setDatabaseAuthVariableOverride(auth)
+                    .build();
+            FirebaseApp.initializeApp(options);
+            return true;
+        } catch (FileNotFoundException ex) {
+            java.util.logging.Logger.getLogger(AuthFactory.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(AuthFactory.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+        //setReference( FirebaseDatabase.getInstance().getReference() );//indica um caminho para criar a tabela getReference exemplo "admin/energy"
     }
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
-        System.out.println("Hello, AuthSnippets!");
-
-            authenticateWithPrivileges();
-            //DatabaseReference usersRef = ref.child("users");//nome da tabela
-
-            Map<String, Usuario> users = new HashMap();
-            users.put("teste6", new Usuario("Fevereiro 02, 1995", "Lucas Bernardo"));
-            users.put("teste7", new Usuario("Janeiro 9, 1906", "Gragas Gordão Hopper"));
-            getReference().child("users").setValueAsync(users);
-
-
-        // Smoke test
-        //createUserWithUid();
-        getUserById("lucas-uid");
-        getUserByEmail("bernardotriton@gmail.com");
-        getUserByPhoneNumber("+5584991770750");
-        //updateUser("lucas-uid");
-        //setCustomUserClaims("some-uid");
-        listAllUsers();
-        //deleteUser("some-uid");
-        createCustomToken();
-        //createCustomTokenWithClaims();
-        System.out.println("Done!");
-    }
-
-    public static DatabaseReference getReference() {
-        return reference;
-    }
-
-    public static void setReference(DatabaseReference reference) {
-        AuthFactory.reference = reference;
-    }
-
+//    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
+//        System.out.println("Hello, AuthSnippets!");
+//
+//        authenticateWithPrivileges();
+//        //DatabaseReference usersRef = ref.child("users");//nome da tabela
+//
+//        Map<String, Usuario> users = new HashMap();
+//        users.put("teste6", new Usuario("Fevereiro 02, 1995", "Lucas Bernardo"));
+//        users.put("teste7", new Usuario("Janeiro 9, 1906", "Gragas Gordão Hopper"));
+//        //getReference().child("users").setValueAsync(users);
+//
+//        // Smoke test
+//        //createUserWithUid();
+////        getUserById("lucas-uid");
+////        getUserByEmail("bernardotriton@gmail.com");
+////        getUserByPhoneNumber("+5584991770750");
+////        //updateUser("lucas-uid");
+////        //setCustomUserClaims("some-uid");
+////        listAllUsers();
+////        //deleteUser("some-uid");
+////        createCustomToken();
+//        //createCustomTokenWithClaims();
+//        System.out.println("Done!");
+//    }
+//    public static DatabaseReference getReference() {
+//        return reference;
+//    }
+//
+//    public static void setReference(DatabaseReference reference) {
+//        AuthFactory.reference = reference;
+//    }
 }
