@@ -14,6 +14,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.tads.eaj.orion.dao.AuthFactory;
 import com.tads.eaj.orion.dao.UsuarioDAO;
@@ -36,10 +37,10 @@ public class Test {
 //                dao.buscar("nome", "lol beta");//ok
 //        salvar();
 //        atualizar("-L9hUBXshdxisEv184-Z", new Usuario("chupa cabra", "querodormir@live.com"));
-//        listar();
+        listar();
 //        excluir("-L9hj2QCqZgCW-tHUWsZ");
 //        buscar("juninho@yahoo.com");
-        buscaTeste();
+//        buscaTeste();
         listAllUsers();//lista os usuários encontrados
 //        getUserById("lucas-uid");
         createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
@@ -53,27 +54,58 @@ public class Test {
         return FirebaseDatabase.getInstance().getReference(caminho);
     }
 
+    private static void buscaTeste2() {
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();
+        Query query = getReferenceDataBase().child("teste").child("user1").orderByChild("nome").equalTo("1");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot ds) {
+                System.out.println("dado recebido: " + ds.toString());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+    }
+    
     private static void buscaTeste() {
         AuthFactory.getInstanceAuthFactory().isAppAutentication();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        reference.child("teste").child("user1").child("nome")
-            .addValueEventListener(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            dataSnapshot.getValue(String.class);
-            System.out.println("dado recebido: " + dataSnapshot.toString());
-        }
+        reference.child("teste")
+            .addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot ds, String string) {
+                
+                System.out.println("recebeu esse papangu: " + ds.toString());
+            }
 
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onChildChanged(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
 
-        }
-    });
+            @Override
+            public void onChildRemoved(DataSnapshot ds) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
     }
 
-    private static void buscar(String key) throws InterruptedException, ExecutionException {
+    private static void buscar() throws InterruptedException, ExecutionException {
         AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        getReferenceDataBase("teste").equalTo("-L9hmCC6uRObRL9A-ipJ").addChildEventListener(new ChildEventListener() {
+        getReferenceDataBase("teste").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String key) {
                 Usuario u = ds.getValue(Usuario.class);
@@ -113,11 +145,12 @@ public class Test {
         //consultas: https://firebase.google.com/docs/database/admin/retrieve-data?hl=pt-br
         AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
         DatabaseReference ref = getReferenceDataBase().child("teste");
-        DatabaseReference newRef = ref.push();
         listAllUsers();//lista os usuários encontrados
         createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-        System.out.println("\nkey" + newRef.getRoot() + "\n" + ref.toString() + "\n" + newRef.getRef() + "\n" + newRef.getKey() + "\n");
-        newRef.orderByKey().addChildEventListener(new ChildEventListener() {
+        
+        System.out.println("\nkey" + ref.getRoot() + "\n" + ref.toString() + "\n" + ref.getRef() + "\n" + ref.getKey() + "\n");
+        
+        ref.orderByKey().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String key) {
                 Usuario u = ds.getValue(Usuario.class);
@@ -149,17 +182,17 @@ public class Test {
     }
 
     private static void atualizar(String key, Usuario usuario) throws InterruptedException, ExecutionException {
-        AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
-        DatabaseReference ref = getReferenceDataBase().child("teste/" + key);
-        DatabaseReference newRef = ref.push();
-        listAllUsers();//lista os usuários encontrados
-//        getUserById("lucas-uid");
-        createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-
-        Map<String, Object> update = new HashMap();
-        update.put("2", usuario);
-
-        ref.updateChildrenAsync(update);
+//        AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
+//        getReferenceDataBase("teste").addChildEventListener(new ChildEventListener)
+//        
+//        listAllUsers();//lista os usuários encontrados
+////        getUserById("lucas-uid");
+//        createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
+//
+//        Map<String, Object> update = new HashMap();
+//        update.put("2", usuario);
+//
+//        ref.updateChildrenAsync(update);
     }
 
     private static void salvar() throws InterruptedException, ExecutionException {
@@ -169,10 +202,9 @@ public class Test {
         listAllUsers();//lista os usuários encontrados
 //        getUserById("lucas-uid");
         createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-        Map<String, Object> users = new HashMap();
-        users.put("user1", new Usuario("1", "lucasbernardo@yahoo.com"));
+        Usuario u = new Usuario("1", "lucasbernardo@yahoo.com");
 
-        newRef.setValueAsync(users);
+        newRef.setValueAsync(u);
 
     }
 
