@@ -5,8 +5,11 @@
  */
 package com.tads.eaj.orion.model;
 
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.tads.eaj.orion.dao.AuthFactory;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

@@ -19,9 +19,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.tads.eaj.orion.dao.AuthFactory;
 import com.tads.eaj.orion.dao.UsuarioDAO;
 import com.tads.eaj.orion.model.Usuario;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,14 +38,23 @@ public class Test {
 //                dao.listarTodos();//ok
 //                dao.merge("node2", new Usuario("lol beta 2", "prata@live.com.br"));//ok
 //                dao.buscar("nome", "lol beta");//ok
-//        salvar();
-//        atualizar("-L9hUBXshdxisEv184-Z", new Usuario("chupa cabra", "querodormir@live.com"));
-//        listar();
-            excluir("nome", "lucas bernardo");
-//        buscar("nome", "junin da mobilete");
-//        buscaTeste();
-        listAllUsers();
-        createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
+//        salvar();//ok
+        atualizar("jubela");//ok
+//        listar();//ok
+//        excluir("nome", "junin da mobilete");//ok
+//        buscar("nome", "junin da mobilete");//pk
+        gerarToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
+    }
+
+    private static void gerarToken(String uid) {
+        try {
+            listAllUsers();
+            createCustomToken(uid);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private static DatabaseReference getReferenceDataBase() {
@@ -53,9 +65,10 @@ public class Test {
         return FirebaseDatabase.getInstance().getReference(caminho);
     }
 
-    private static void buscar(String field, String value) {
+    private static void buscar(String field, String value) throws InterruptedException, ExecutionException {
         AuthFactory.getInstanceAuthFactory().isAppAutentication();
         Query query = getReferenceDataBase().child("teste").orderByChild(field).equalTo(value);
+        gerarToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot ds) {
@@ -68,7 +81,7 @@ public class Test {
             }
         });
     }
-    
+
     private static void listar() throws InterruptedException, ExecutionException {
 
         //consultas: https://firebase.google.com/docs/database/admin/retrieve-data?hl=pt-br
@@ -80,6 +93,7 @@ public class Test {
         ref.orderByKey().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String key) {
+
                 Usuario u = ds.getValue(Usuario.class);
                 System.out.println("key = " + key + " Usuario: " + u.toString());
             }
@@ -108,24 +122,97 @@ public class Test {
         });
     }
 
-    private static void excluir(String field, String value) throws InterruptedException, ExecutionException {
+    private static void excluir(String field, final String value) throws InterruptedException, ExecutionException {
+
         AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        Query query = getReferenceDataBase().child("teste").orderByChild(field).equalTo(value);
-//        query.
+        Query query = getReferenceDataBase().child("teste")/*.orderByChild(field).equalTo(value)*/;
+        gerarToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
+        query.orderByValue().addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot ds, String string) {
+
+                Usuario u = ds.getValue(Usuario.class);
+                System.out.println("\nNome passado: " + value + " nome encontrado: " + u.getNome() + "\n\n");
+                if (u.getNome().equalsIgnoreCase(value)) {
+                    getReferenceDataBase("teste/" + ds.getKey()).removeValueAsync();
+                    System.out.println("tchau querida!");
+                } else {
+                    System.out.println("deu bode!");
+                    return;
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot ds) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
     }
 
-    private static void atualizar(String key, Usuario usuario) throws InterruptedException, ExecutionException {
-//        AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
-//        getReferenceDataBase("teste").addChildEventListener(new ChildEventListener)
-//        
-//        listAllUsers();//lista os usuários encontrados
-////        getUserById("lucas-uid");
-//        createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-//
-//        Map<String, Object> update = new HashMap();
-//        update.put("2", usuario);
-//
-//        ref.updateChildrenAsync(update);
+    private static void atualizar(final String value) throws InterruptedException, ExecutionException {
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();
+        Query query = getReferenceDataBase().child("teste")/*.orderByChild(field).equalTo(value)*/;
+        gerarToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
+        query.orderByValue().addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot ds, String string) {
+
+                Usuario u = ds.getValue(Usuario.class);
+                if (u.getNome().equalsIgnoreCase(value)) {
+                    System.out.println("\nNome passado: " + value + " nome encontrado: " + u.getNome() + "\n\n");
+                    u.setNome("papa angu da silva sauro");
+                    u.setEmail("angu@live.com");
+
+                    Map<String, Object> childUpdates = new HashMap();
+                    childUpdates.put("/teste/" + ds.getKey(), u);
+
+
+                    getReferenceDataBase().updateChildrenAsync(childUpdates);
+
+                } else {
+                    System.out.println("deu bode!");
+                    return;
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot ds) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+
     }
 
     private static void salvar() throws InterruptedException, ExecutionException {
@@ -135,7 +222,7 @@ public class Test {
         listAllUsers();//lista os usuários encontrados
 //        getUserById("lucas-uid");
         createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-        Usuario u = new Usuario("junin da mobilete", "juninho@yahoo.com");
+        Usuario u = new Usuario("patrick", "vrau@yahoo.com");
 
         newRef.setValueAsync(u);
 
