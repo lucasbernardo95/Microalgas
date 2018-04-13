@@ -9,26 +9,17 @@ package com.tads.eaj.orion.model;
  */
 public class Sensor {
 
-    private Integer id;
     private String tipo;
     private String dado;
 
     public Sensor() {
     }
 
-    public Sensor(Integer id, String tipo, String dado) {
-        this.id = id;
+    public Sensor( String tipo, String dado) {
         this.tipo = tipo;
         this.dado = dado;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getTipo() {
         return tipo;
@@ -48,13 +39,14 @@ public class Sensor {
 
     @Override
     public String toString() {
-        return "Sensor{" + "id=" + id + ", tipo=" + tipo + ", dado=" + dado + '}';
+        return "Sensor{" + "tipo=" + tipo + ", dado=" + dado + '}';
     }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 97 * hash + (this.id != null ? this.id.hashCode() : 0);
+        int hash = 3;
+        hash = 67 * hash + (this.tipo != null ? this.tipo.hashCode() : 0);
+        hash = 67 * hash + (this.dado != null ? this.dado.hashCode() : 0);
         return hash;
     }
 
@@ -70,7 +62,10 @@ public class Sensor {
             return false;
         }
         final Sensor other = (Sensor) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if ((this.tipo == null) ? (other.tipo != null) : !this.tipo.equals(other.tipo)) {
+            return false;
+        }
+        if ((this.dado == null) ? (other.dado != null) : !this.dado.equals(other.dado)) {
             return false;
         }
         return true;

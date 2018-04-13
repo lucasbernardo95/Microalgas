@@ -5,13 +5,23 @@
  */
 package com.tads.eaj.orion.dao;
 
+import com.google.firebase.auth.ExportedUserRecord;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.ListUsersPage;
+import com.google.firebase.auth.UserRecord;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.tads.eaj.orion.model.Node;
+import com.tads.eaj.orion.model.Usuario;
+import com.tads.eaj.orion.test.Test;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -23,80 +33,32 @@ import java.util.logging.Logger;
  */
 public class NodeDAO {
 
+    private Node no;
+    private String key;//chave para excluir o objeto
+    private List<Node> lista;
 
-    private void gerarToken() throws InterruptedException, ExecutionException {
-        AuthFactory.getInstanceAuthFactory().getUserById("lucas-uid");//Recupera o uid do usuário
-//        AuthFactory.getInstanceAuthFactory().getUserByEmail("bernardotriton@gmail.com");//recupera o email
-//        AuthFactory.getInstanceAuthFactory().getUserByPhoneNumber("+5584991770750");//recupera o telefone
-        AuthFactory.getInstanceAuthFactory().listAllUsers();//lista os usuários encontrados
-        AuthFactory.getInstanceAuthFactory().createCustomToken();//cria um token para liberar as operações
-    }
-
-    /**
-     * Método para atualizar um objeto existente no banco ou criar um novo caso
-     * o dado enviado não exista na tabela informada
-     *
-     * @param id chave primária do objeto (identificador)
-     * @param node ojeto a ser salvo
-     */
-    public void merge(String id, Node node) {
-        try {
-            //seta as credênciais da aplicação para autenticação com o banco
-            AuthFactory.getInstanceAuthFactory().isAppAutentication();
-            //seta o objeto e o id
-            Map<String, Object> objeto = new HashMap();
-            objeto.put(id, node);
-            //detecta alterações na tabela
-            notificar();
-            //informa a tabela e salva
-            getReference("nodes").updateChildrenAsync(objeto);
-            //gera um toquem com dados do usuário da aplicação
-            gerarToken();
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-
-    }
-
-    
-    /**
-     * Método para ouvir a rede e detectar qualquer evento de alterações
-     * (altualização, exclusão, adição...) na tabela.
-     *
-     * obs:
-     *
-     * Garantias de evento do banco de dados Os eventos serão sempre acionados
-     * quando o estado local mudar. No fim, eles sempre refletirão o estado
-     * correto dos dados, mesmo quando as operações ou o tempo locais causem
-     * diferenças temporárias, como a perda temporária de conexão com a rede. As
-     * gravações de um único cliente sempre serão gravadas no servidor e
-     * transmitidas a outros usuários, respeitando a ordem. Os eventos "value"
-     * sempre serão acionados por último e sempre conterão as atualizações de
-     * todos os outros eventos ocorridos antes da geração do instantâneo.
-     */
-    private void notificar() {
-        getReference("nodes").addChildEventListener(
-                new ChildEventListener() {
+    public void buscar(String field, String value) throws InterruptedException, ExecutionException {
+        no = null;
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();
+        Query query = getReferenceDataBase().child("nodes").orderByChild(field).equalTo(value);
+        gerarToken();
+        query.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot ds, String chaveAnterior) {
-                Node u = ds.getValue(Node.class);
-                System.out.println("Um novo elemento foi adicionado:\n" + u.toString());
-                System.out.println("ID da chave anterior:\n\n" + chaveAnterior);
+            public void onChildAdded(DataSnapshot ds, String string) {
+                setNo(ds.getValue(Node.class));
+                key = ds.getKey();
+                System.out.println("dado: " + ds.getValue());
+                System.out.println("no: " + no.toString() + " key " + key);
             }
 
             @Override
             public void onChildChanged(DataSnapshot ds, String string) {
-                Node u = ds.getValue(Node.class);
-                System.out.println("Alteração detectada em:\n\n" + u.toString());
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void onChildRemoved(DataSnapshot ds) {
-                Node u = ds.getValue(Node.class);
-                System.out.println("O seguinte dado foi excluído:\n\n" + u.toString());
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
@@ -109,123 +71,198 @@ public class NodeDAO {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
-
     }
 
-    public void listarTodos() {
-        try {
-            AuthFactory.getInstanceAuthFactory().isAppAutentication();
-            //listar todos por nome
-            getReference("nodes").orderByKey().addChildEventListener(
-                    new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot ds, String key) {
-                    Node u = ds.getValue(Node.class);
-                    System.out.println("Chave: " + key + " Node: " + ds.toString());
-                }
+    public void buscarPorId(Integer id) {
+        no = null;
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();
+        Query query = getReferenceDataBase().child("nodes").orderByChild("id").equalTo(id);
+        gerarToken();
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot ds, String string) {
+                setNo(ds.getValue(Node.class));
+                key = ds.getKey();
+                System.out.println("dado: " + ds.getValue());
+                System.out.println("no: " + no.toString() + " key " + key);
+            }
 
-                @Override
-                public void onChildChanged(DataSnapshot ds, String string) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
+            @Override
+            public void onChildChanged(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
 
-                @Override
-                public void onChildRemoved(DataSnapshot ds) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
+            @Override
+            public void onChildRemoved(DataSnapshot ds) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
 
-                @Override
-                public void onChildMoved(DataSnapshot ds, String string) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
+            @Override
+            public void onChildMoved(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
 
-                @Override
-                public void onCancelled(DatabaseError de) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+    }
+
+    public void listar() throws InterruptedException, ExecutionException {
+        lista = null;
+        //consultas: https://firebase.google.com/docs/database/admin/retrieve-data?hl=pt-br
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
+        DatabaseReference ref = getReferenceDataBase().child("nodes");
+        gerarToken();
+        ref.orderByKey().addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot ds, String key) {
+                //insere a lista de objetos vindos do banco na lista
+                no = ds.getValue(Node.class);
+                if (no != null) {
+                    if (lista == null) {
+                        lista = new ArrayList();
+                    }
+                    lista.add(no);
                 }
             }
-            );
 
+            @Override
+            public void onChildChanged(DataSnapshot ds, String key) {
+                Usuario u = ds.getValue(Usuario.class);
+                System.out.println("Changed=> key: " + key + "\nUsuario: " + u.toString());
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot ds) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot ds, String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void onCancelled(DatabaseError de) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        });
+
+    }
+
+    public void excluir(final Integer id) throws InterruptedException, ExecutionException {
+        no = null;
+        key = null;
+        buscarPorId(id);
+
+        gerarToken();
+        if (!key.equals("")) {
+            System.out.println("\nEncontrado: " + getNo().toString() + "\nkey " + key + "\n");
+            getReferenceDataBase("nodes/" + key).removeValueAsync();
+        } else {
+            System.out.println("Objeto não encontrado");
+        }
+
+    }
+
+    public void atualizar(final Integer id, Node node) {
+        no = null;
+        key = null;
+
+        buscarPorId(id);
+        gerarToken();
+
+        if (!key.equals("")) {
+            System.out.println("node old: " + getNo());
+            System.out.println("node new: " + node);
+            setNo(node);
+            Map<String, Object> childUpdates = new HashMap();
+            childUpdates.put("/nodes/" + key, getNo());
+
+            getReferenceDataBase().updateChildrenAsync(childUpdates);
+        } else {
+            System.out.println("Erro ao tentar atualizar");
+        }
+
+    }
+
+    public boolean salvar(Node newNode) throws InterruptedException, ExecutionException {
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
+        DatabaseReference ref = getReferenceDataBase().child("nodes");
+        //push() gera uma chave exclusiva para cada novo filho
+        if (newNode.getId() != null && newNode.getRegiao() != null && newNode.getEnergia() != null) {
+            ref.push().setValueAsync(newNode);
             gerarToken();
+            return true;
+        }
+        return false;
+
+    }
+
+    public static String getUserById(String uid) throws InterruptedException, ExecutionException {
+
+        UserRecord userRecord = FirebaseAuth.getInstance().getUserAsync(uid).get();
+        System.out.println("Successfully fetched user data: " + userRecord.getUid());
+        return userRecord.getUid();
+
+    }
+
+    public static void listAllUsers() throws InterruptedException, ExecutionException {
+        ListUsersPage page = FirebaseAuth.getInstance().listUsersAsync(null).get();
+        while (page != null) {
+            for (ExportedUserRecord user : page.getValues()) {
+                System.out.println("User: " + user.getUid() + "\n" + user.getEmail());
+            }
+            page = page.getNextPage();
+        }
+        page = FirebaseAuth.getInstance().listUsersAsync(null).get();
+        for (ExportedUserRecord user : page.iterateAll()) {
+            System.out.println("User: " + user.getUid());
+        }
+    }
+
+    private static void createCustomToken(String uid) throws InterruptedException, ExecutionException {
+
+        String customToken = FirebaseAuth.getInstance().createCustomTokenAsync("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2").get();
+        System.out.println("Created custom token: " + customToken);
+    }
+
+    public void gerarToken() {
+        try {
+            listAllUsers();
+            createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
         } catch (InterruptedException ex) {
             Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
             Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
-    /**
-     *  retorna uma referência do banco de dados no caminho especificado
-     *  caminho: é o caminho de onde desejo recuperar uma instância
-     **/
-    private DatabaseReference getReference(String caminho){
+    public static DatabaseReference getReferenceDataBase() {
+        return FirebaseDatabase.getInstance().getReference();
+    }
+
+    public static DatabaseReference getReferenceDataBase(String caminho) {
         return FirebaseDatabase.getInstance().getReference(caminho);
     }
-    
-    /**
-     * Método para buscar um dado específicado pelo campo e valor
-     * 
-     * @param field campo usado como critério de busca
-     * @param value valor do campo exemplo fiel = email value = "test@live.com"
-     */
-    public void buscar(String field, String value) {
-        try {
-            AuthFactory.getInstanceAuthFactory().isAppAutentication();
-            getReference("node1").orderByChild(field).equalTo(value).addChildEventListener(
-                    new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot ds, String key) {
-                    Node u = ds.getValue(Node.class);
-                    System.out.println("onChildAdded=>Chave: " + key + " Node: " + ds.toString());
-                }
 
-                @Override
-                public void onChildChanged(DataSnapshot ds, String key) {
-                    Node u = ds.getValue(Node.class);
-                    System.out.println("onChildChanged=> Chave: " + key + " Node: " + ds.toString());
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot ds) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot ds, String string) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public void onCancelled(DatabaseError de) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-            });
-
-            gerarToken();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+    public Node getNo() {
+        return no;
     }
 
-    /**
-     * Método para deletar um objeto da tabela por completo
-     * @param key é o id do objeto a ser deletado
-     */
-    public void deletar(String key) {
-        try {
-            AuthFactory.getInstanceAuthFactory().isAppAutentication();
-            getReference("nodes/"+key).removeValueAsync();
-            notificar();
-            gerarToken();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public void setNo(Node no) {
+        this.no = no;
+    }
+
+    public List<Node> getLista() {
+        return lista;
+    }
+
+    public void setLista(List<Node> lista) {
+        this.lista = lista;
     }
 
 }

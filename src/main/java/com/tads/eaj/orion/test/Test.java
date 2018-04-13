@@ -17,9 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.tads.eaj.orion.dao.AuthFactory;
-import com.tads.eaj.orion.dao.UsuarioDAO;
 import com.tads.eaj.orion.model.Usuario;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -33,16 +31,12 @@ import java.util.logging.Logger;
 public class Test {
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-//                UsuarioDAO dao = new UsuarioDAO();
-//                dao.deletar("node10");//ok
-//                dao.listarTodos();//ok
-//                dao.merge("node2", new Usuario("lol beta 2", "prata@live.com.br"));//ok
-//                dao.buscar("nome", "lol beta");//ok
+
 //        salvar();//ok
-        atualizar("jubela");//ok
-//        listar();//ok
+//        atualizar("jubela");//ok
+        listar();//ok
 //        excluir("nome", "junin da mobilete");//ok
-//        buscar("nome", "junin da mobilete");//pk
+//        buscar("email", "angu@live.com");//pk
         gerarToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
     }
 
@@ -73,6 +67,7 @@ public class Test {
             @Override
             public void onDataChange(DataSnapshot ds) {
                 System.out.println("dado recebido: " + ds.toString());
+                System.out.println("dado recebido: " + ds.getValue());
             }
 
             @Override
@@ -96,6 +91,7 @@ public class Test {
 
                 Usuario u = ds.getValue(Usuario.class);
                 System.out.println("key = " + key + " Usuario: " + u.toString());
+                System.out.println("key = " + ds.getKey() + " Usuario: " + ds.getValue());
             }
 
             @Override
@@ -218,13 +214,11 @@ public class Test {
     private static void salvar() throws InterruptedException, ExecutionException {
         AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
         DatabaseReference ref = getReferenceDataBase().child("teste");
-        DatabaseReference newRef = ref.push();//ue gera uma chave exclusiva para cada novo filho
-        listAllUsers();//lista os usuários encontrados
-//        getUserById("lucas-uid");
-        createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
-        Usuario u = new Usuario("patrick", "vrau@yahoo.com");
+//        DatabaseReference newRef = ref.push();//ue gera uma chave exclusiva para cada novo filho
+        Usuario u = new Usuario("fudeno", "fudeno@yahoo.com");
 
-        newRef.setValueAsync(u);
+        ref.push().setValueAsync(u);
+        gerarToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
 
     }
 
