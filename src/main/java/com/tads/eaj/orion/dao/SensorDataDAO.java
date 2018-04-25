@@ -15,10 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.tads.eaj.orion.model.Node;
-import com.tads.eaj.orion.model.Usuario;
-import com.tads.eaj.orion.test.Test;
+import com.tads.eaj.orion.model.SensorData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,23 +26,36 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author lber
+ * @author berna
  */
-public class NodeDAO {
+public class SensorDataDAO {
+    private SensorData no; 
+    private String key;//chave gerada quando o dado é salvo no banco
+    private List<SensorData> lista;
+    
+    public boolean salvar(SensorData newNode) throws InterruptedException, ExecutionException {
+        AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
+        DatabaseReference ref = getReferenceDataBase().child("sensorData");
+        //push() gera uma chave exclusiva para cada novo filho
+        if ( newNode != null ) {
+            ref.push().setValueAsync(newNode);
+            gerarToken();
+            return true;
+        }
+        return false;
 
-    private Node no;
-    private String key;//chave para excluir o objeto
-    private List<Node> lista;
-
+    }
+    
     public void buscar(String field, String value) throws InterruptedException, ExecutionException {
         no = null;
         AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        Query query = getReferenceDataBase().child("nodes").orderByChild(field).equalTo(value);
+        Query query = getReferenceDataBase().child("sensorData").orderByChild(field).equalTo(value);
         gerarToken();
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String string) {
-                setNo(ds.getValue(Node.class));
+
+                setNo(ds.getValue(SensorData.class));
                 key = ds.getKey();
                 System.out.println("dado: " + ds.getValue());
                 System.out.println("no: " + no.toString() + " key " + key);
@@ -73,15 +83,16 @@ public class NodeDAO {
         });
     }
 
-    public void buscarPorId(Integer id) {
+    public void buscarPorId(String id) {
         no = null;
         AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        Query query = getReferenceDataBase().child("nodes").orderByChild("id").equalTo(id);
+        Query query = getReferenceDataBase().child("sensorData").orderByChild("id").equalTo(id);
         gerarToken();
         query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String string) {
-                setNo(ds.getValue(Node.class));
+
+                setNo(ds.getValue(SensorData.class));
                 key = ds.getKey();
                 System.out.println("dado: " + ds.getValue());
                 System.out.println("no: " + no.toString() + " key " + key);
@@ -113,13 +124,13 @@ public class NodeDAO {
         lista = null;
         //consultas: https://firebase.google.com/docs/database/admin/retrieve-data?hl=pt-br
         AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
-        DatabaseReference ref = getReferenceDataBase().child("nodes");
+        DatabaseReference ref = getReferenceDataBase().child("sensorData");
         gerarToken();
         ref.orderByKey().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot ds, String key) {
                 //insere a lista de objetos vindos do banco na lista
-                no = ds.getValue(Node.class);
+                no = ds.getValue(SensorData.class);
                 if (no != null) {
                     if (lista == null) {
                         lista = new ArrayList();
@@ -130,8 +141,6 @@ public class NodeDAO {
 
             @Override
             public void onChildChanged(DataSnapshot ds, String key) {
-                Usuario u = ds.getValue(Usuario.class);
-                System.out.println("Changed=> key: " + key + "\nUsuario: " + u.toString());
             }
 
             @Override
@@ -153,7 +162,7 @@ public class NodeDAO {
 
     }
 
-    public void excluir(final Integer id) throws InterruptedException, ExecutionException {
+    public void excluir(final String id) throws InterruptedException, ExecutionException {
         no = null;
         key = null;
         buscarPorId(id);
@@ -161,14 +170,14 @@ public class NodeDAO {
         gerarToken();
         if (!key.equals("")) {
             System.out.println("\nEncontrado: " + getNo().toString() + "\nkey " + key + "\n");
-            getReferenceDataBase("nodes/" + key).removeValueAsync();
+            getReferenceDataBase("sensorData/" + key).removeValueAsync();
         } else {
             System.out.println("Objeto não encontrado");
         }
 
     }
 
-    public void atualizar(final Integer id, Node node) {
+    public void atualizar(final String id, SensorData node) {
         no = null;
         key = null;
 
@@ -180,25 +189,12 @@ public class NodeDAO {
             System.out.println("node new: " + node);
             setNo(node);
             Map<String, Object> childUpdates = new HashMap();
-            childUpdates.put("/nodes/" + key, getNo());
+            childUpdates.put("/sensorData/" + key, getNo());
 
             getReferenceDataBase().updateChildrenAsync(childUpdates);
         } else {
             System.out.println("Erro ao tentar atualizar");
         }
-
-    }
-
-    public boolean salvar(Node newNode) throws InterruptedException, ExecutionException {
-        AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
-        DatabaseReference ref = getReferenceDataBase().child("nodes");
-        //push() gera uma chave exclusiva para cada novo filho
-        if (newNode.getId() != null && newNode.getRegiao() != null && newNode.getEnergia() != null) {
-            ref.push().setValueAsync(newNode);
-            gerarToken();
-            return true;
-        }
-        return false;
 
     }
 
@@ -235,9 +231,9 @@ public class NodeDAO {
             listAllUsers();
             createCustomToken("ZqUyhCnHIiVxmWhMtUaxvJRWYbm2");
         } catch (InterruptedException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SensorDataDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExecutionException ex) {
-            Logger.getLogger(NodeDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SensorDataDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -249,20 +245,31 @@ public class NodeDAO {
         return FirebaseDatabase.getInstance().getReference(caminho);
     }
 
-    public Node getNo() {
+    public SensorData getNo() {
         return no;
     }
 
-    public void setNo(Node no) {
+    public void setNo(SensorData no) {
         this.no = no;
     }
 
-    public List<Node> getLista() {
+    public List<SensorData> getLista() {
         return lista;
     }
 
-    public void setLista(List<Node> lista) {
+    public void setLista(List<SensorData> lista) {
         this.lista = lista;
     }
 
+    /**
+     * retorna a key de identificação do objeto após ser salvo no banco
+     * @retur key gerada pelo banco ao inserir um node
+     */
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 }

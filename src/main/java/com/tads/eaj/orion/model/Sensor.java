@@ -15,12 +15,11 @@ public class Sensor {
     public Sensor() {
     }
 
-    public Sensor( String tipo, String dado) {
+    public Sensor(String tipo, String dado) {
         this.tipo = tipo;
         this.dado = dado;
     }
-
-
+    
     public String getTipo() {
         return tipo;
     }

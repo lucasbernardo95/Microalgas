@@ -5,16 +5,16 @@
  */
 package com.tads.eaj.orion.service;
 
-import com.tads.eaj.orion.dao.NodeDAO;
-import com.tads.eaj.orion.model.Node;
+import com.tads.eaj.orion.dao.SensorDataDAO;
+import com.tads.eaj.orion.model.NodeJson;
 import com.tads.eaj.orion.model.Sensor;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.tads.eaj.orion.model.SensorData;
+import com.tads.eaj.orion.response.OutputMessage;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,151 +28,205 @@ import javax.ws.rs.core.Response;
 @Path("/esp")
 public class ServicoESP {
 
-    private NodeDAO dao;
-
-    /**
-     *
-     * @param id identificador do node
-     * @return o node correspondente ao id passado no parâmetro 
-     */
-    @GET
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response buscar(@PathParam("id") int id) {
-        dao = new NodeDAO();
-        dao.buscarPorId(id);
-        dao.gerarToken();
-        if (dao.getNo() != null) {
-            System.out.println("deu bom");
-            return Response.status(Response.Status.OK).entity(dao.getNo())
-                    .header("Access-Control-Allow-Origin", "*")
-                    .build();//200
-        } else {
-            System.out.println("deu ruim");
-            return Response.status(Response.Status.NOT_FOUND).entity("Erro: objeto não encontrado")
-                    .header("Access-Control-Allow-Origin", "*")
-                    .build();//404
-        }
-    }
-
-    /**
-     * listagem de nodes armazenados no banco
-     *
-     * @return lista de Node em formato .json
-     */
-    @POST
-    @Path("/listar")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response listar() {
-        dao = new NodeDAO();
-
-        try {
-            dao.listar();
-            dao.gerarToken();
-            return Response.status(Response.Status.OK).entity(dao.getLista())
-                    .header("Access-Control-Allow-Origin", "*")
-                    .build();//200
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ServicoESP.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
-            Logger.getLogger(ServicoESP.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return Response.status(Response.Status.NOT_FOUND).entity("Erro ao listar os nodes")
-                .header("Access-Control-Allow-Origin", "*")
-                .build();//200
-
-    }
-
-    /**
+   /**
      * Método para criação de um no. Recebe um .json de um node e armazena no
      * banco.
      *
-     * @param no .json de um node
+     * @param no .json de um node no formado:
+     *
+     * {
+     * "id": "ESP1", 
+     * "regiao": "R4", 
+     * "energia": 4.4, 
+     * "sensores": [ 
+     *     { 
+     *      "tipo": "Nivel de água", 
+     *      "dado": "20" 
+     *     }, 
+     *     { 
+     *      "tipo": "Temperatura da água", 
+     *      "dado": "25" 
+     *     }, 
+     *     { 
+     *      "tipo": "PH", 
+     *      "dado": "10" 
+     *     } 
+     * ] 
+     *}
+     *
      * @return reposta informando se a operação foi bem sucedida ou não.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response criarNode(Node no) {
-        String sms = "";
-        if (no != null) {
+    public Response create(NodeJson no) {
 
-            dao = new NodeDAO();
-            try {
-                dao.salvar(no);
+        try {
+
+            if (no == null) {
+                return Response
+                        .status(Response.Status.NOT_ACCEPTABLE)
+                        .entity(new OutputMessage(500, "Objeto inválido!"))
+                        .build();
+            } else {
+                SensorDataDAO dao = new SensorDataDAO();
+                System.out.println("objeto recebido: " + no.toString());
+                for (Sensor s : no.getSensores()) {
+                    SensorData data = new SensorData(no.getId(), no.getRegiao(), s.getTipo(), s.getDado());
+                    dao.salvar(data);
+                }//SensorData data = new SensorData(no.getId(), no.getRegiao(), "energia", no.getEnergia() + "");
                 dao.gerarToken();
-                sms = "Node salvo com sucesso";
-                return Response.status(Response.Status.OK).entity(sms)
-                        .header("Access-Control-Allow-Origin", "*")
-                        .build();//200
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ServicoESP.class.getName()).log(Level.SEVERE, null, ex);
-                sms += ex + "\n\n";
-            } catch (ExecutionException ex) {
-                Logger.getLogger(ServicoESP.class.getName()).log(Level.SEVERE, null, ex);
-                sms += ex + "\n\n";
+                //quando receber o dado do sensor de energia, chamar a classe Publisher para mandar a política a ser aplicada
             }
+        } catch (Exception e) {
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new OutputMessage(500, e.getMessage()))
+                    .build();
 
         }
 
-        return Response.status(Response.Status.NOT_FOUND).entity(sms)
-                .header("Access-Control-Allow-Origin", "*")
-                .build();//200
+        return Response
+                .status(Response.Status.CREATED)
+                .entity(no)
+                .build();
 
     }
 
-    @POST
-    @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response atualizarNode(@PathParam("id") Integer id, Node no) {
-        String sms = "";
-        if (no != null && id != null) {
-
-            dao = new NodeDAO();
-
-                dao.atualizar(id, no);
-                dao.gerarToken();
-                sms = "Node salvo com sucesso";
-                return Response.status(Response.Status.OK).entity(sms)
-                        .header("Access-Control-Allow-Origin", "*")
-                        .build();//200
-
-
-        } else if (id == null || id <= 0) 
-            sms += "ID inválido";
-        else if (no == null)
-            sms += "Dados do node inválidos";
-
-        return Response.status(Response.Status.NOT_FOUND).entity(sms)
-                .header("Access-Control-Allow-Origin", "*")
-                .build();//200
-        
-    }
-    
+    /**
+     * Método para deletar um objeto pelo id informado
+     *
+     * @param id identificador do objeto buscado
+     * @return resposta do servidor refernete a operação de delete se ocorreu
+     * com sucesso ou não.
+     */
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletar(@PathParam("id") Integer id) throws InterruptedException, ExecutionException {
-        String sms = "";
-        if ( id != null) {
+    public Response delete(@PathParam("id") String id) {
 
-            dao = new NodeDAO();
+        if (id == null || id.equals("")) {
+            return Response
+                    .status(Response.Status.NO_CONTENT)
+                    .build();
 
-                dao.excluir(id);
-                dao.gerarToken();
-                sms = "Node salvo com sucesso";
-                return Response.status(Response.Status.OK).entity(sms)
-                        .header("Access-Control-Allow-Origin", "*")
-                        .build();//200
+        }
+        try {
+            SensorDataDAO dao = new SensorDataDAO();
+            dao.excluir(id);
+            dao.gerarToken();
+        } catch (Exception e) {
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new OutputMessage(500, e.getMessage()))
+                    .build();
 
+        }
+        return Response
+                .status(Response.Status.OK)
+                .entity(new OutputMessage(200, "Objeto removido."))
+                .build();
 
-        } else if (id == null || id <= 0) 
-            sms += "ID inválido";
-
-        return Response.status(Response.Status.NOT_FOUND).entity(sms)
-                .header("Access-Control-Allow-Origin", "*")
-                .build();//200
     }
-    
+
+    /**
+     * Método para atualizar um node do banco de dados
+     *
+     * @param id identificador do objetoo a ser atualizado
+     * @param no json do objeto contendo seus atributos
+     * @return resposta contendo uma mensagem e um código indicando se deu certo
+     * ou não.
+     */
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response update(@PathParam("id") String id, SensorData no) {
+
+        if (id == null || id.equals("")) {
+            return Response
+                    .status(Response.Status.NO_CONTENT)
+                    .entity(new OutputMessage(500, "ID inválido"))
+                    .build();
+        }
+        try {
+            SensorDataDAO dao = new SensorDataDAO();
+            dao.atualizar(id, no);
+            dao.gerarToken();
+        } catch (Exception e) {
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new OutputMessage(500, e.getMessage()))
+                    .build();
+
+        }
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(no)
+                .build();
+
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listById(@PathParam("id") String id) {
+        try {
+
+            if (id == null || id.equals("")) {
+                return Response
+                        .status(Response.Status.NO_CONTENT)
+                        .entity(new OutputMessage(500, "ID inválido"))
+                        .build();
+
+            } else {
+                SensorDataDAO dao = new SensorDataDAO();
+                dao.buscarPorId(id);
+                dao.gerarToken();
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(dao.getNo()) //objeto retornado do banco
+                        .build();
+
+            }
+        } catch (Exception e) {
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new OutputMessage(500, e.getMessage()))
+                    .build();
+
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listAll() {
+        try {
+            SensorDataDAO dao = new SensorDataDAO();
+            dao.listar();
+            dao.gerarToken();
+
+            if (dao.getLista() == null) {
+                return Response
+                        .status(Response.Status.NO_CONTENT)
+                        .entity(new OutputMessage(500, "Nenhum objeto encontrado no banco"))
+                        .build();
+
+            } else {
+                return Response
+                        .status(Response.Status.OK)
+                        .entity(dao.getLista())
+                        .build();
+
+            }
+        } catch (Exception e) {
+            return Response
+                    .status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new OutputMessage(500, e.getMessage()))
+                    .build();
+
+        }
+    }
+
 }

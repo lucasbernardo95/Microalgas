@@ -43,7 +43,7 @@ public class Publisher {
                 cliente.publish(topic, message);
                 System.out.println("Message published => " +content);
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                     //cliente.disconnect();
                 } catch (Exception e) {
                     e.printStackTrace();

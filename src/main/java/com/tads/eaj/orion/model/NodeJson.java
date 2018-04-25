@@ -4,37 +4,41 @@
 package com.tads.eaj.orion.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author Lucas
  */
-
 @IgnoreExtraProperties
-public class Node {
+public class NodeJson {
 
-    private Integer id;
+    private String id;
     private String regiao;
     private Double energia;
     private List<Sensor> sensores;
 
-    public Node() {
+    public NodeJson() {
     }
 
-    public Node(Integer id, String regiao, Double energia, List<Sensor> sensores) {
+    public NodeJson(String id, String regiao, Double energia, List<Sensor> sensores) {
         this.id = id;
         this.regiao = regiao;
         this.energia = energia;
         this.sensores = sensores;
     }
 
-    public Integer getId() {
+    public NodeJson(String id, String regiao, Double energia) {
+        this.id = id;
+        this.regiao = regiao;
+        this.energia = energia;
+    }
+    
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -46,20 +50,20 @@ public class Node {
         this.regiao = regiao;
     }
 
-    public Double getEnergia() {
-        return energia;
-    }
-
-    public void setEnergia(Double energia) {
-        this.energia = energia;
-    }
-
     public List<Sensor> getSensores() {
         return sensores;
     }
 
     public void setSensores(List<Sensor> sensores) {
         this.sensores = sensores;
+    }
+
+    public Double getEnergia() {
+        return energia;
+    }
+
+    public void setEnergia(Double energia) {
+        this.energia = energia;
     }
 
     @Override
@@ -69,11 +73,10 @@ public class Node {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + (this.id != null ? this.id.hashCode() : 0);
-        hash = 97 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
-        hash = 97 * hash + (this.energia != null ? this.energia.hashCode() : 0);
-        hash = 97 * hash + (this.sensores != null ? this.sensores.hashCode() : 0);
+        int hash = 3;
+        hash = 53 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 53 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
+        hash = 53 * hash + (this.sensores != null ? this.sensores.hashCode() : 0);
         return hash;
     }
 
@@ -88,14 +91,11 @@ public class Node {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Node other = (Node) obj;
+        final NodeJson other = (NodeJson) obj;
+        if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
+            return false;
+        }
         if ((this.regiao == null) ? (other.regiao != null) : !this.regiao.equals(other.regiao)) {
-            return false;
-        }
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
-            return false;
-        }
-        if (this.energia != other.energia && (this.energia == null || !this.energia.equals(other.energia))) {
             return false;
         }
         if (this.sensores != other.sensores && (this.sensores == null || !this.sensores.equals(other.sensores))) {
@@ -103,5 +103,5 @@ public class Node {
         }
         return true;
     }
-    
+
 }
