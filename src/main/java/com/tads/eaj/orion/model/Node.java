@@ -10,30 +10,23 @@ import java.util.List;
  *
  * @author Lucas
  */
-@IgnoreExtraProperties
-public class NodeJson {
+
+public class Node {
 
     private String id;
     private String regiao;
-    private Double energia;
+    private String dataHora;
     private List<Sensor> sensores;
 
-    public NodeJson() {
+    public Node() {
     }
 
-    public NodeJson(String id, String regiao, Double energia, List<Sensor> sensores) {
+    public Node(String id, String regiao, List<Sensor> sensores) {
         this.id = id;
         this.regiao = regiao;
-        this.energia = energia;
         this.sensores = sensores;
     }
 
-    public NodeJson(String id, String regiao, Double energia) {
-        this.id = id;
-        this.regiao = regiao;
-        this.energia = energia;
-    }
-    
     public String getId() {
         return id;
     }
@@ -58,25 +51,19 @@ public class NodeJson {
         this.sensores = sensores;
     }
 
-    public Double getEnergia() {
-        return energia;
+    public String getDataHora() {
+        return dataHora;
     }
 
-    public void setEnergia(Double energia) {
-        this.energia = energia;
-    }
-
-    @Override
-    public String toString() {
-        return "Node{" + "id=" + id + ", regiao=" + regiao + ", energia=" + energia + ", sensores=" + sensores + '}';
+    public void setDataHora(String dataHora) {
+        this.dataHora = dataHora;
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + (this.id != null ? this.id.hashCode() : 0);
-        hash = 53 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
-        hash = 53 * hash + (this.sensores != null ? this.sensores.hashCode() : 0);
+        int hash = 7;
+        hash = 37 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 37 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
         return hash;
     }
 
@@ -91,17 +78,19 @@ public class NodeJson {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final NodeJson other = (NodeJson) obj;
+        final Node other = (Node) obj;
         if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
             return false;
         }
         if ((this.regiao == null) ? (other.regiao != null) : !this.regiao.equals(other.regiao)) {
             return false;
         }
-        if (this.sensores != other.sensores && (this.sensores == null || !this.sensores.equals(other.sensores))) {
-            return false;
-        }
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "NodeJson{" + "id=" + id + ", regiao=" + regiao + ", dataHora=" + dataHora + ", sensores=" + sensores + '}';
+    }
+    
 }

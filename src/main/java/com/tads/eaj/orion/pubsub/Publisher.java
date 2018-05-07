@@ -14,44 +14,66 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
  * @author Lucas Bernardo
  */
 public class Publisher {
+    /**
+     * Método responsável por publicar uma política periódicamente sempre que o 
+     * tempo definido no parâmetro se esgotar
+     * @param politica política a ser aplicada nos nodes da rede
+     * @param periodo tempo máximo em ML para repetir o processo de publicação
+     */
 
-    public static void main(String[] args) {
-
+    public static void publicarPorPeriodo(String politica, Integer periodo) {
+        try {
+            publicar(politica);
+            Thread.sleep(periodo); //exm.: 1000 = 1s
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Método responsável por publicar a política a ser aplicada ao node que
+     * mandou a mensagem contendo o dado de energia.
+     *
+     * O tópico publicado sera "idNode/política ex.: ESP1/DeepSleep"
+     *
+     * @param politica a ser aplicada
+     */
+    public static void publicar(String politica) {
+        System.out.println("publisher!!!");
+//        Integer tentativas = 0; //quantidade de tentativas para publicar o dado
         String topic = "orion/energyPolicy";
-        String content = "choro level 4";
-        int qos = 2;
-        String broker = "tcp://localhost:1883";
-        String clientId = "publisher 1";
+        //String content = "choro level 4";
+        int qos = 2;//qos = 2 indica que vai ter confirmação em ambos os lados do recebimento da mensagem
+        String broker = "tcp://localhost:1883";//endereço do broker
+        String clientId = "publisher 1";//id desta aplicação que está publicando (o middleware)
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
+            //seta as credênciais 
             MqttClient cliente = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
-
-            System.out.println("Connecting to broker: " + broker);
             cliente.connect(connOpts);
 
-            //Subscriber.increver();
-            System.out.println("Connected");
-            System.out.println("Publish message: " + content);
+            System.out.println("Connected to broker: " + broker);
+            System.out.println("Publish message: " + politica);
 
-            MqttMessage message = new MqttMessage(content.getBytes());
+            //cria a mensagem
+            MqttMessage message = new MqttMessage(politica.getBytes());
             message.setQos(qos);
-            //publica mensagem no tópico desejado
-            while (true) {
-                cliente.publish(topic, message);
-                System.out.println("Message published => " +content);
-                try {
-                    Thread.sleep(2000);
-                    //cliente.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
 
-            // System.out.println("Disconnected");
-            // System.exit(0);
+            //envia a mensagem 5 vezes para garantir que o nodemcu receberá a mensagem
+            cliente.publish(topic, message);//publica mensagem no tópico desejado
+            System.out.println("Message published => " + politica);
+//                try {
+//                    Thread.sleep(500);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+
+            cliente.disconnect();
+
+            System.out.println("Disconnected");
         } catch (MqttException me) {
             System.out.println("reason " + me.getReasonCode());
             System.out.println("msg " + me.getMessage());

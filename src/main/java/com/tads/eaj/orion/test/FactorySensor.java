@@ -5,10 +5,16 @@
  */
 package com.tads.eaj.orion.test;
 
-import java.time.Instant;
+import com.tads.eaj.orion.dao.NodeDAO;
+import com.tads.eaj.orion.model.Node;
+import com.tads.eaj.orion.model.Sensor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -19,31 +25,53 @@ public class FactorySensor {
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
 
-        LocalDate localDate = LocalDate.now();
-        System.out.println(localDate);
-
-        LocalDateTime localDateTime = LocalDateTime.now();
-        LocalTime localTime = localDateTime.toLocalTime();
-
-        System.out.println(localDateTime + "   ||   " + localTime);
-
-        Instant instant = Instant.now();
-        long timeStampSeconds = instant.getEpochSecond();
-        
-        System.out.println(instant + "   ||  " + timeStampSeconds);
-
-//        List<Sensor> lista  = new ArrayList<Sensor>();
-//        lista.add(new Sensor( "Nivel de água", "100"));
-//        lista.add(new Sensor( "Temperatura", "100"));
-//        lista.add(new Sensor( "PH", "100"));
+        List<Sensor> s1 = new ArrayList<Sensor>();
+        s1.add(new Sensor("Temperatura água", "22"));
+        s1.add(new Sensor("pH", "39"));
+        s1.add(new Sensor("Energia", "41"));
 //
-//        SensorDAO sdao = new SensorDAO();
-//        sdao.salvar("-LAuQZGMf53cIS9BFiIf" , lista);//ok
+//        List<Sensor> s2 = new ArrayList<Sensor>();
+//        s2.add(new Sensor("Temperatura ambiente", "27"));
+//        s2.add(new Sensor("Temperatura ambiente", "27"));
+//        s2.add(new Sensor("energia", "78"));
 //
-////        sdao.buscar("idNode", "ESP1");
+        Node no1 = new Node("ESP1", "Interna", s1);
+//        Node no2 = new Node("ESP2", "Externa", s2);
+//        LocalDate localDate = LocalDate.now();
+//        LocalDateTime localDateTime = LocalDateTime.now();
+//        LocalTime localTime = localDateTime.toLocalTime();
+//        no1.setDataHora(localDate + " | " + localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
+//        no2.setDataHora(localDate + " | " + localTime);
+        NodeDAO dao = new NodeDAO();
+//        dao.salvar(no1);
+//        dao.salvar(no2);
+
+        //busca //2018-05-07 | 13:13:19.22
+        dao.buscar("tipo", "pH");
+        //listagem
+//        dao.listar();
+        //excluir
+//        dao.excluir("ESP1");
+        //atualizar
+//        dao.atualizar("ESP1", no1);
+        dao.gerarToken();
+        System.out.println(dao.getNo());
+//        for (Node node : dao.getLista()) {
+//            System.out.println(node.getDataHora());
+//        }
+//        Publisher.publicar("DeepSleep");
 //
-//        sdao.gerarToken();
-//        System.out.println(sdao.getSensor());
     }
 
+    /*
+    Message message = new Message(username, body, time);
+ 
+Map<String, Object> messageValues = message.toMap();
+Map<String, Object> childUpdates = new HashMap<>();
+ 
+String key = mDatabase.child("messages").push().getKey();
+ 
+childUpdates.put("/messages/" + key, messageValues);
+childUpdates.put("/user-messages/" + user.getUid() + "/" + key, messageValues);
+     */
 }

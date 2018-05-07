@@ -5,11 +5,15 @@
  */
 package com.tads.eaj.orion.service;
 
-import com.tads.eaj.orion.dao.SensorDataDAO;
-import com.tads.eaj.orion.model.NodeJson;
-import com.tads.eaj.orion.model.Sensor;
-import com.tads.eaj.orion.model.SensorData;
+import com.tads.eaj.orion.dao.NodeDAO;
+import com.tads.eaj.orion.model.Node;
+import com.tads.eaj.orion.pubsub.Publisher;
 import com.tads.eaj.orion.response.OutputMessage;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -28,39 +32,52 @@ import javax.ws.rs.core.Response;
 @Path("/esp")
 public class ServicoESP {
 
-   /**
+    /**
+     * aplicação de uma política de energia
+     * @param policy política a ser aplicada
+     * @return código indicando se ocorreu tudo corretamente
+     */
+    @PUT
+    @Path("politica/{policy}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response applyPolicy(@PathParam("policy") String policy) {
+
+        if (policy.equals("")
+                && !policy.equalsIgnoreCase("deepsleep")
+                && !policy.equalsIgnoreCase("modemsleep")
+                && !policy.equalsIgnoreCase("lightsleep")) {
+            System.out.println("valor da política: " + policy);
+            return Response
+                    .status(Response.Status.NOT_ACCEPTABLE)
+                    .entity(new OutputMessage(500, "Política inválida!"))
+                    .build();
+        } else {
+            Publisher.publicar(policy.toLowerCase());
+            return Response
+                    .status(Response.Status.CREATED)
+                    .entity(new OutputMessage(500, "Política aplicada com sucesso!"))
+                    .build();
+        }
+    }
+
+    /**
      * Método para criação de um no. Recebe um .json de um node e armazena no
      * banco.
      *
      * @param no .json de um node no formado:
      *
      * {
-     * "id": "ESP1", 
-     * "regiao": "R4", 
-     * "energia": 4.4, 
-     * "sensores": [ 
-     *     { 
-     *      "tipo": "Nivel de água", 
-     *      "dado": "20" 
-     *     }, 
-     *     { 
-     *      "tipo": "Temperatura da água", 
-     *      "dado": "25" 
-     *     }, 
-     *     { 
-     *      "tipo": "PH", 
-     *      "dado": "10" 
-     *     } 
-     * ] 
-     *}
+     * "id": "ESP1", "regiao": "R4", "energia": 4.4, "sensores": [ { "tipo":
+     * "Nivel de água", "dado": "20" }, { "tipo": "Temperatura da água", "dado":
+     * "25" }, { "tipo": "PH", "dado": "10" } ] }
      *
      * @return reposta informando se a operação foi bem sucedida ou não.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(NodeJson no) {
-
+    public Response create(Node no) {
+        System.out.println("Dado recebido: " + no.toString());
         try {
 
             if (no == null) {
@@ -69,14 +86,12 @@ public class ServicoESP {
                         .entity(new OutputMessage(500, "Objeto inválido!"))
                         .build();
             } else {
-                SensorDataDAO dao = new SensorDataDAO();
-                System.out.println("objeto recebido: " + no.toString());
-                for (Sensor s : no.getSensores()) {
-                    SensorData data = new SensorData(no.getId(), no.getRegiao(), s.getTipo(), s.getDado());
-                    dao.salvar(data);
-                }//SensorData data = new SensorData(no.getId(), no.getRegiao(), "energia", no.getEnergia() + "");
-                dao.gerarToken();
-                //quando receber o dado do sensor de energia, chamar a classe Publisher para mandar a política a ser aplicada
+                LocalDate localDate = LocalDate.now();
+                LocalDateTime localDateTime = LocalDateTime.now();
+                LocalTime localTime = localDateTime.toLocalTime();
+                no.setDataHora(localDate + " | " + localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
+                
+                //salva o dado do nó no banco
             }
         } catch (Exception e) {
             return Response
@@ -112,7 +127,7 @@ public class ServicoESP {
 
         }
         try {
-            SensorDataDAO dao = new SensorDataDAO();
+            NodeDAO dao = new NodeDAO();
             dao.excluir(id);
             dao.gerarToken();
         } catch (Exception e) {
@@ -141,7 +156,7 @@ public class ServicoESP {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response update(@PathParam("id") String id, SensorData no) {
+    public Response update(@PathParam("id") String id, Node no) {
 
         if (id == null || id.equals("")) {
             return Response
@@ -150,7 +165,7 @@ public class ServicoESP {
                     .build();
         }
         try {
-            SensorDataDAO dao = new SensorDataDAO();
+            NodeDAO dao = new NodeDAO();
             dao.atualizar(id, no);
             dao.gerarToken();
         } catch (Exception e) {
@@ -181,7 +196,7 @@ public class ServicoESP {
                         .build();
 
             } else {
-                SensorDataDAO dao = new SensorDataDAO();
+                NodeDAO dao = new NodeDAO();
                 dao.buscarPorId(id);
                 dao.gerarToken();
                 return Response
@@ -203,7 +218,7 @@ public class ServicoESP {
     @Produces(MediaType.APPLICATION_JSON)
     public Response listAll() {
         try {
-            SensorDataDAO dao = new SensorDataDAO();
+            NodeDAO dao = new NodeDAO();
             dao.listar();
             dao.gerarToken();
 
