@@ -34,6 +34,7 @@ public class ServicoESP {
 
     /**
      * aplicação de uma política de energia
+     *
      * @param policy política a ser aplicada
      * @return código indicando se ocorreu tudo corretamente
      */
@@ -90,8 +91,11 @@ public class ServicoESP {
                 LocalDateTime localDateTime = LocalDateTime.now();
                 LocalTime localTime = localDateTime.toLocalTime();
                 no.setDataHora(localDate + " | " + localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
-                
+
                 //salva o dado do nó no banco
+                NodeDAO dao = new NodeDAO();
+                dao.salvar(no);
+                dao.gerarToken();
             }
         } catch (Exception e) {
             return Response
@@ -219,7 +223,9 @@ public class ServicoESP {
     public Response listAll() {
         try {
             NodeDAO dao = new NodeDAO();
+
             dao.listar();
+
             dao.gerarToken();
 
             if (dao.getLista() == null) {

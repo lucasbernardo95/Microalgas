@@ -25,17 +25,17 @@ public class FactorySensor {
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
 
-        List<Sensor> s1 = new ArrayList<Sensor>();
-        s1.add(new Sensor("Temperatura água", "22"));
-        s1.add(new Sensor("pH", "39"));
-        s1.add(new Sensor("Energia", "41"));
+//        List<Sensor> s1 = new ArrayList<Sensor>();
+//        s1.add(new Sensor("Temperatura água", "22"));
+//        s1.add(new Sensor("pH", "39"));
+//        s1.add(new Sensor("Energia", "41"));
 //
 //        List<Sensor> s2 = new ArrayList<Sensor>();
 //        s2.add(new Sensor("Temperatura ambiente", "27"));
 //        s2.add(new Sensor("Temperatura ambiente", "27"));
 //        s2.add(new Sensor("energia", "78"));
-//
-        Node no1 = new Node("ESP1", "Interna", s1);
+////
+//        Node no1 = new Node("ESP1", "Interna", s1);
 //        Node no2 = new Node("ESP2", "Externa", s2);
 //        LocalDate localDate = LocalDate.now();
 //        LocalDateTime localDateTime = LocalDateTime.now();
@@ -43,22 +43,14 @@ public class FactorySensor {
 //        no1.setDataHora(localDate + " | " + localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
 //        no2.setDataHora(localDate + " | " + localTime);
         NodeDAO dao = new NodeDAO();
-//        dao.salvar(no1);
-//        dao.salvar(no2);
 
-        //busca //2018-05-07 | 13:13:19.22
-        dao.buscar("tipo", "pH");
-        //listagem
-//        dao.listar();
-        //excluir
-//        dao.excluir("ESP1");
-        //atualizar
-//        dao.atualizar("ESP1", no1);
+        dao.listar();
+
         dao.gerarToken();
-        System.out.println(dao.getNo());
-//        for (Node node : dao.getLista()) {
-//            System.out.println(node.getDataHora());
-//        }
+
+        for (Node node : dao.getLista()) {
+            System.out.println(node.getDataHora());
+        }
 //        Publisher.publicar("DeepSleep");
 //
     }
