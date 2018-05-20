@@ -33,35 +33,6 @@ import javax.ws.rs.core.Response;
 public class ServicoESP {
 
     /**
-     * aplicação de uma política de energia
-     *
-     * @param policy política a ser aplicada
-     * @return código indicando se ocorreu tudo corretamente
-     */
-    @PUT
-    @Path("politica/{policy}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response applyPolicy(@PathParam("policy") String policy) {
-
-        if (policy.equals("")
-                && !policy.equalsIgnoreCase("deepsleep")
-                && !policy.equalsIgnoreCase("modemsleep")
-                && !policy.equalsIgnoreCase("lightsleep")) {
-            System.out.println("valor da política: " + policy);
-            return Response
-                    .status(Response.Status.NOT_ACCEPTABLE)
-                    .entity(new OutputMessage(500, "Política inválida!"))
-                    .build();
-        } else {
-            Publisher.publicar(policy.toLowerCase());
-            return Response
-                    .status(Response.Status.CREATED)
-                    .entity(new OutputMessage(500, "Política aplicada com sucesso!"))
-                    .build();
-        }
-    }
-
-    /**
      * Método para criação de um no. Recebe um .json de um node e armazena no
      * banco.
      *
@@ -78,7 +49,6 @@ public class ServicoESP {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(Node no) {
-        System.out.println("Dado recebido: " + no.toString());
         try {
 
             if (no == null) {
@@ -90,7 +60,8 @@ public class ServicoESP {
                 LocalDate localDate = LocalDate.now();
                 LocalDateTime localDateTime = LocalDateTime.now();
                 LocalTime localTime = localDateTime.toLocalTime();
-                no.setDataHora(localDate + " | " + localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
+                no.setData(String.valueOf(localDate));
+                no.setHora(String.valueOf(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))));
 
                 //salva o dado do nó no banco
                 NodeDAO dao = new NodeDAO();

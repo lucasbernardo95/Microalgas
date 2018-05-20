@@ -3,7 +3,6 @@
  */
 package com.tads.eaj.orion.model;
 
-import com.google.firebase.database.IgnoreExtraProperties;
 import java.util.List;
 
 /**
@@ -15,16 +14,21 @@ public class Node {
 
     private String id;
     private String regiao;
-    private String dataHora;
+    private String data;
+    private String hora;
+    private String politica;
     private List<Sensor> sensores;
 
     public Node() {
     }
 
-    public Node(String id, String regiao, List<Sensor> sensores) {
+    public Node(String id, String regiao, String data, String hora, String politica, List<Sensor> sensores) {
         this.id = id;
         this.regiao = regiao;
+        this.data = data;
+        this.hora = hora;
         this.sensores = sensores;
+        this.politica = politica;
     }
 
     public String getId() {
@@ -51,19 +55,38 @@ public class Node {
         this.sensores = sensores;
     }
 
-    public String getDataHora() {
-        return dataHora;
+    public String getData() {
+        return data;
     }
 
-    public void setDataHora(String dataHora) {
-        this.dataHora = dataHora;
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
+    }
+
+    public String getPolitica() {
+        return politica;
+    }
+
+    public void setPolitica(String politica) {
+        this.politica = politica;
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + (this.id != null ? this.id.hashCode() : 0);
-        hash = 37 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
+        int hash = 3;
+        hash = 47 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 47 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
+        hash = 47 * hash + (this.data != null ? this.data.hashCode() : 0);
+        hash = 47 * hash + (this.hora != null ? this.hora.hashCode() : 0);
+        hash = 47 * hash + (this.politica != null ? this.politica.hashCode() : 0);
         return hash;
     }
 
@@ -85,12 +108,21 @@ public class Node {
         if ((this.regiao == null) ? (other.regiao != null) : !this.regiao.equals(other.regiao)) {
             return false;
         }
+        if ((this.data == null) ? (other.data != null) : !this.data.equals(other.data)) {
+            return false;
+        }
+        if ((this.hora == null) ? (other.hora != null) : !this.hora.equals(other.hora)) {
+            return false;
+        }
+        if ((this.politica == null) ? (other.politica != null) : !this.politica.equals(other.politica)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "NodeJson{" + "id=" + id + ", regiao=" + regiao + ", dataHora=" + dataHora + ", sensores=" + sensores + '}';
+        return "Node{" + "id=" + id + ", regiao=" + regiao + ", data=" + data + ", hora=" + hora + ", politica=" + politica + ", sensores=" + sensores + '}';
     }
     
 }

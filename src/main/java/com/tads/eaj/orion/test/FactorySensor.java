@@ -6,7 +6,9 @@
 package com.tads.eaj.orion.test;
 
 import com.tads.eaj.orion.dao.NodeDAO;
+import com.tads.eaj.orion.dao.PoliticaDAO;
 import com.tads.eaj.orion.model.Node;
+import com.tads.eaj.orion.model.Politica;
 import com.tads.eaj.orion.model.Sensor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,24 +37,41 @@ public class FactorySensor {
 //        s2.add(new Sensor("Temperatura ambiente", "27"));
 //        s2.add(new Sensor("energia", "78"));
 ////
-//        Node no1 = new Node("ESP1", "Interna", s1);
-//        Node no2 = new Node("ESP2", "Externa", s2);
-//        LocalDate localDate = LocalDate.now();
-//        LocalDateTime localDateTime = LocalDateTime.now();
-//        LocalTime localTime = localDateTime.toLocalTime();
-//        no1.setDataHora(localDate + " | " + localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)));
-//        no2.setDataHora(localDate + " | " + localTime);
-        NodeDAO dao = new NodeDAO();
+//        Node no1 = new Node("ESP1", "Interna", "", "", s1);
+////        Node no2 = new Node("ESP2", "Externa", s2);
+        LocalDate localDate = LocalDate.now();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalTime localTime = localDateTime.toLocalTime();
+//        no1.setData(String.valueOf(localDate));
+//        no1.setHora(String.valueOf(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))));
+//        NodeDAO dao = new NodeDAO();
+//        dao.salvar(no1);
+//        dao.listar();
 
-        dao.listar();
-
-        dao.gerarToken();
-
-        for (Node node : dao.getLista()) {
-            System.out.println(node.getDataHora());
-        }
+//        dao.gerarToken();
+//        for (Node node : dao.getLista()) {
+//            System.out.println(node.getDataHora());
+//        }
 //        Publisher.publicar("DeepSleep");
-//
+
+        /*=====================politicas==================*/
+        localTime = localDateTime.toLocalTime();
+        Politica p = new Politica("deepsleep", String.valueOf(localDate), localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT)), "10");
+        localTime = localDateTime.toLocalTime();
+        Politica p2 = new Politica("modemsleep", String.valueOf(localDate), String.valueOf(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))), "0");
+        localTime = localDateTime.toLocalTime();
+        Politica p3 = new Politica("lightsleep", String.valueOf(localDate), String.valueOf(localTime.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT))), "0");
+        PoliticaDAO pdao = new PoliticaDAO();
+//        pdao.salvar(p);
+//        pdao.salvar(p2);
+//        pdao.salvar(p3);
+        pdao.listar();
+        pdao.gerarToken();
+        System.out.println("\n\n");
+        for (Politica pc : pdao.getLista()) {
+            System.out.println(pc.toString());
+        }
+
     }
 
     /*

@@ -41,18 +41,22 @@ public class Publisher {
     public static void publicar(String politica) {
         System.out.println("publisher!!!");
 //        Integer tentativas = 0; //quantidade de tentativas para publicar o dado
-        String topic = "orion/energyPolicy";
+        String topic = "mpmee/energyPolicy";
         //String content = "choro level 4";
         int qos = 2;//qos = 2 indica que vai ter confirmação em ambos os lados do recebimento da mensagem
-        String broker = "tcp://localhost:1883";//endereço do broker
-        String clientId = "publisher 1";//id desta aplicação que está publicando (o middleware)
+        String broker = "tcp://m14.cloudmqtt.com:13367";//endereço do broker
+        String clientId = "publisher";//id desta aplicação que está publicando (o middleware)
         MemoryPersistence persistence = new MemoryPersistence();
+        String senha = "mpmeePublisher";
+        String usuario = "mpmeePublisher";
 
         try {
             //seta as credênciais 
             MqttClient cliente = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
+//            connOpts.setCleanSession(true);
+            connOpts.setUserName(senha);
+            connOpts.setPassword(senha.toCharArray());
             cliente.connect(connOpts);
 
             System.out.println("Connected to broker: " + broker);
