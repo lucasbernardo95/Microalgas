@@ -1,7 +1,7 @@
 /*
  * Aplicação para publicar dados na rede para os sensores da apicação Orion.
  */
-package com.tads.eaj.orion.pubsub;
+package com.tads.eaj.mpm2ee.pubsub;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;

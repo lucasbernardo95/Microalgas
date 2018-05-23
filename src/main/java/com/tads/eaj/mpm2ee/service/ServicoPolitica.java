@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tads.eaj.orion.service;
+package com.tads.eaj.mpm2ee.service;
 
-import com.tads.eaj.orion.dao.PoliticaDAO;
-import com.tads.eaj.orion.model.Politica;
-import com.tads.eaj.orion.pubsub.Publisher;
-import com.tads.eaj.orion.response.OutputMessage;
+import com.tads.eaj.mpm2ee.dao.PoliticaDAO;
+import com.tads.eaj.mpm2ee.model.Politica;
+import com.tads.eaj.mpm2ee.pubsub.Publisher;
+import com.tads.eaj.mpm2ee.response.OutputMessage;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

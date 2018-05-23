@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tads.eaj.orion</groupId>
-    <artifactId>orionRemoteManager</artifactId>
+    <artifactId>mpm2ee</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>orionRemoteManager</name>
+    <name>mpm2ee</name>
     
     <repositories>
         <repository>

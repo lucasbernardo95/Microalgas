@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tads.eaj.orion.dao;
+package com.tads.eaj.mpm2ee.dao;
 
 import com.google.firebase.auth.ExportedUserRecord;
 import com.google.firebase.auth.FirebaseAuth;
@@ -14,12 +14,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.tads.eaj.orion.model.Node;
+import com.tads.eaj.mpm2ee.model.Politica;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,14 +25,15 @@ import java.util.logging.Logger;
  *
  * @author berna
  */
-public class NodeDAO {
-    private Node no; 
+public class PoliticaDAO {
+
+    private Politica no;
     private String key;//chave gerada quando o dado é salvo no banco
-    private List<Node> lista;
+    private List<Politica> lista;
+
+    private final String TABELA = "Politicas";//nome da tabela
     
-    private final String TABELA = "Nodes";//nome da tabela
-    
-    public boolean salvar(Node newNode) throws InterruptedException, ExecutionException {
+    public boolean salvar(Politica newNode) throws InterruptedException, ExecutionException {
         AuthFactory.getInstanceAuthFactory().isAppAutentication();//registra o app
         DatabaseReference ref = getReferenceDataBase().child(TABELA);
         //push() gera uma chave exclusiva para cada novo filho
@@ -48,80 +46,6 @@ public class NodeDAO {
 
     }
     
-    public void buscar(String field, String value) throws InterruptedException, ExecutionException {
-        no = null;
-        AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        Query query = getReferenceDataBase().child(TABELA).orderByChild(field).equalTo(value);
-        gerarToken();
-        query.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot ds, String string) {
-                System.out.println("ds: " +ds.getValue(Node.class));
-                setNo(ds.getValue(Node.class));
-                key = ds.getKey();
-//                System.out.println("dado: " + ds.getValue());
-//                System.out.println("no: " + no.toString() + " key " + key);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot ds, String string) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot ds) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot ds, String string) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onCancelled(DatabaseError de) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-    }
-
-    public void buscarPorId(String id) {
-        no = null;
-        AuthFactory.getInstanceAuthFactory().isAppAutentication();
-        Query query = getReferenceDataBase().child(TABELA).orderByChild("id").equalTo(id);
-        gerarToken();
-        query.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot ds, String string) {
-
-                setNo(ds.getValue(Node.class));
-                key = ds.getKey();
-                System.out.println("dado: " + ds.getValue());
-                System.out.println("no: " + no.toString() + " key " + key);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot ds, String string) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot ds) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot ds, String string) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            @Override
-            public void onCancelled(DatabaseError de) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-    }
-
     public void listar() throws InterruptedException, ExecutionException {
         lista = null;
         //consultas: https://firebase.google.com/docs/database/admin/retrieve-data?hl=pt-br
@@ -132,7 +56,7 @@ public class NodeDAO {
             @Override
             public void onChildAdded(DataSnapshot ds, String key) {
                 //insere a lista de objetos vindos do banco na lista
-                no = ds.getValue(Node.class);
+                no = ds.getValue(Politica.class);
                 if (no != null) {
                     if (lista == null) {
                         lista = new ArrayList();
@@ -161,42 +85,6 @@ public class NodeDAO {
             }
 
         });
-
-    }
-
-    public void excluir(final String id) throws InterruptedException, ExecutionException {
-        no = null;
-        key = null;
-        buscarPorId(id);
-
-        gerarToken();
-        if (!key.equals("")) {
-            System.out.println("\nEncontrado: " + getNo().toString() + "\nkey " + key + "\n");
-            getReferenceDataBase(TABELA+"/" + key).removeValueAsync();
-        } else {
-            System.out.println("Objeto não encontrado");
-        }
-
-    }
-
-    public void atualizar(final String id, Node node) {
-        no = null;
-        key = null;
-
-        buscarPorId(id);
-        gerarToken();
-
-        if (!key.equals("")) {
-            System.out.println("node old: " + getNo());
-            System.out.println("node new: " + node);
-            setNo(node);
-            Map<String, Object> childUpdates = new HashMap();
-            childUpdates.put(TABELA+"/" + key, getNo());
-
-            getReferenceDataBase().updateChildrenAsync(childUpdates);
-        } else {
-            System.out.println("Erro ao tentar atualizar");
-        }
 
     }
 
@@ -247,24 +135,25 @@ public class NodeDAO {
         return FirebaseDatabase.getInstance().getReference(caminho);
     }
 
-    public Node getNo() {
+    public Politica getNo() {
         return no;
     }
 
-    public void setNo(Node no) {
+    public void setNo(Politica no) {
         this.no = no;
     }
 
-    public List<Node> getLista() {
+    public List<Politica> getLista() {
         return lista;
     }
 
-    public void setLista(List<Node> lista) {
+    public void setLista(List<Politica> lista) {
         this.lista = lista;
     }
 
     /**
      * retorna a key de identificação do objeto após ser salvo no banco
+     *
      * @retur key gerada pelo banco ao inserir um node
      */
     public String getKey() {

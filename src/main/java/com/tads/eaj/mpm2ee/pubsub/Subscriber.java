@@ -6,7 +6,7 @@
  * um novo dado publicado neste tópico o mosquitto notifica e o subscriber 
  * recebe a mensagem.
  */
-package com.tads.eaj.orion.pubsub;
+package com.tads.eaj.mpm2ee.pubsub;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;

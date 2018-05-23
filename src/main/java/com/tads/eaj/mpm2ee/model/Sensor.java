@@ -1,7 +1,7 @@
 /*
  * A classe sensor representa um sensor da rede com seu dado coletado
  */
-package com.tads.eaj.orion.model;
+package com.tads.eaj.mpm2ee.model;
 
 /**
  *

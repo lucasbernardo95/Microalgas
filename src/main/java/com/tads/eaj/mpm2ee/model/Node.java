@@ -1,7 +1,7 @@
 /*
  * Classe que representa um nó da rede (NodeMcu ou arduino).
  */
-package com.tads.eaj.orion.model;
+package com.tads.eaj.mpm2ee.model;
 
 import java.util.List;
 
@@ -16,17 +16,19 @@ public class Node {
     private String regiao;
     private String data;
     private String hora;
+    private String duracao;
     private String politica;
     private List<Sensor> sensores;
 
     public Node() {
     }
 
-    public Node(String id, String regiao, String data, String hora, String politica, List<Sensor> sensores) {
+    public Node(String id, String regiao, String data, String hora, String duracao, String politica, List<Sensor> sensores) {
         this.id = id;
         this.regiao = regiao;
         this.data = data;
         this.hora = hora;
+        this.duracao = duracao;
         this.sensores = sensores;
         this.politica = politica;
     }
@@ -79,14 +81,23 @@ public class Node {
         this.politica = politica;
     }
 
+    public String getDuracao() {
+        return duracao;
+    }
+
+    public void setDuracao(String duracao) {
+        this.duracao = duracao;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 47 * hash + (this.id != null ? this.id.hashCode() : 0);
-        hash = 47 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
-        hash = 47 * hash + (this.data != null ? this.data.hashCode() : 0);
-        hash = 47 * hash + (this.hora != null ? this.hora.hashCode() : 0);
-        hash = 47 * hash + (this.politica != null ? this.politica.hashCode() : 0);
+        int hash = 7;
+        hash = 59 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 59 * hash + (this.regiao != null ? this.regiao.hashCode() : 0);
+        hash = 59 * hash + (this.data != null ? this.data.hashCode() : 0);
+        hash = 59 * hash + (this.hora != null ? this.hora.hashCode() : 0);
+        hash = 59 * hash + (this.duracao != null ? this.duracao.hashCode() : 0);
+        hash = 59 * hash + (this.politica != null ? this.politica.hashCode() : 0);
         return hash;
     }
 
@@ -114,6 +125,9 @@ public class Node {
         if ((this.hora == null) ? (other.hora != null) : !this.hora.equals(other.hora)) {
             return false;
         }
+        if ((this.duracao == null) ? (other.duracao != null) : !this.duracao.equals(other.duracao)) {
+            return false;
+        }
         if ((this.politica == null) ? (other.politica != null) : !this.politica.equals(other.politica)) {
             return false;
         }
@@ -122,7 +136,7 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node{" + "id=" + id + ", regiao=" + regiao + ", data=" + data + ", hora=" + hora + ", politica=" + politica + ", sensores=" + sensores + '}';
+        return "Node{" + "id=" + id + ", regiao=" + regiao + ", data=" + data + ", hora=" + hora + ", duracao=" + duracao + ", politica=" + politica + ", sensores=" + sensores + '}';
     }
     
 }
