@@ -5,17 +5,8 @@
  */
 package com.tads.eaj.mpm2ee.test;
 
-import com.tads.eaj.mpm2ee.model.Node;
 import com.tads.eaj.mpm2ee.pubsub.Publisher;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.regex.Pattern;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -24,10 +15,13 @@ import java.util.regex.Pattern;
 public class Teste {
 
     public static void main(String[] args) {
-
-            Publisher.publicar("publica quaalquer coisa");
+        System.out.println(Response.Status.CREATED);
+            //deepsleep
+            //Publisher.publicar("1");
+            //modemsleep
+            //Publisher.publicar("modemsleep");
+            //lightsleep
+            //Publisher.publicar("lightsleep");
             
-//            Node no = new Node(id, regiao, data, hora, duracao, politica, sensores)
-
     }
 }

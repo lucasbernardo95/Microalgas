@@ -49,7 +49,7 @@ public class ServicoESP {
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(Node no) {
         try {
-
+            System.out.println("Dado recebido: " + no.toString());
             if (no == null) {
                 return Response
                         .status(Response.Status.NOT_ACCEPTABLE)
